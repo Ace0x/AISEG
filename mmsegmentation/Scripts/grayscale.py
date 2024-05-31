@@ -1,54 +1,54 @@
+import os
 import cv2
 import numpy as np
-import os
+from pathlib import Path
 
-# Define the color palette and class mappings
-palette = [
-    [0, 255, 255],   # urban_land
-    [255, 255, 0],   # agriculture_land
-    [255, 0, 255],   # rangeland
-    [0, 255, 0],     # forest_land
-    [0, 0, 255],     # water
-    [255, 255, 255], # barren_land
-    [0, 0, 0]        # unknown
-]
+# Define the color classes with their lower and upper bounds
+color_classes = {
+    'urban_land': {'range': [(0, 225, 225), (30, 255, 255)], 'greyscale': 0},
+    'agriculture_land': {'range': [(225, 225, 0), (255, 255, 30)], 'greyscale': 1},
+    'rangeland': {'range': [(225, 0, 225), (255, 30, 255)], 'greyscale': 2},
+    'forest_land': {'range': [(0, 225, 0), (30, 255, 30)], 'greyscale': 3},
+    'water': {'range': [(0, 0, 225), (30, 30, 255)], 'greyscale': 4},
+    'barren_land': {'range': [(225, 225, 225), (255, 255, 255)], 'greyscale': 5},
+    'unknown': {'range': [(0, 0, 0), (30, 30, 30)], 'greyscale': 6}
+}
 
-classes = [0, 1, 2, 3, 4, 5, 6]
+# Function to map colors to greyscale
+def map_color_to_greyscale(image, color_classes):
+    height, width, _ = image.shape
+    greyscale_image = np.zeros((height, width), dtype=np.uint8)
 
-# Create a mapping from RGB color to class index
-class_mapping = {tuple(color): cls for color, cls in zip(palette, classes)}
+    for color_class in color_classes.values():
+        lower_bound = np.array(color_class['range'][0], dtype=np.uint8)
+        upper_bound = np.array(color_class['range'][1], dtype=np.uint8)
+        grey_value = color_class['greyscale']
 
-input_dir = "../data/land_cover/ann_dir/train"
-output_dir = "../data/land_cover/ann_dir/grayscale"
+        mask = cv2.inRange(image, lower_bound, upper_bound)
+        greyscale_image[mask > 0] = grey_value
 
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+    return greyscale_image
 
-# Process each file in the input directory
-for filename in os.listdir(input_dir):
-    if filename.endswith('.png'):  
+# Path to the folder containing the masks
+input_folder = '../data/land_cover/ann_dir/grayt'
+output_folder = '../data/land_cover/ann_dir/train'
+Path(output_folder).mkdir(parents=True, exist_ok=True)
+
+# Process each image in the input folder
+for filename in os.listdir(input_folder):
+    if filename.endswith('.png') or filename.endswith('.jpg'):
         # Read the image
-        img_path = os.path.join(input_dir, filename)
-        img = cv2.imread(img_path)
-        
-        if img is None:
-            print(f"Failed to read {img_path}. Skipping...")
-            continue
+        image_path = os.path.join(input_folder, filename)
+        image = cv2.imread(image_path)
 
-        # Initialize the grayscale image with the default class for 'unknown'
-        gray_img = np.full((img.shape[0], img.shape[1]), class_mapping[(0, 0, 0)], dtype=np.uint8)
+        # Convert from BGR to RGB
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # Convert the image to grayscale based on the color mapping
-        for color, cls in class_mapping.items():
-            mask = np.all(img == np.array(color), axis=-1)
-            gray_img[mask] = cls
-        
-        # Save the grayscale image
-        output_path = os.path.join(output_dir, filename)
-        if cv2.imwrite(output_path, gray_img):
-            print(f"Converted {filename} to grayscale.")
-        else:
-            print(f"Failed to write {output_path}.")
-        
-print("Conversion complete.")
+        # Map colors to greyscale
+        greyscale_image = map_color_to_greyscale(image, color_classes)
 
+        # Save the resulting image
+        output_path = os.path.join(output_folder, filename)
+        cv2.imwrite(output_path, greyscale_image)
+
+print("Processing complete. Greyscale masks saved to", output_folder)
