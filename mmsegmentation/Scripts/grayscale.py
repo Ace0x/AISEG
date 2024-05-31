@@ -3,15 +3,15 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-# Define the color classes with their lower and upper bounds
+# Define the color classes with their exact values
 color_classes = {
-    'urban_land': {'range': [(0, 225, 225), (30, 255, 255)], 'greyscale': 0},
-    'agriculture_land': {'range': [(225, 225, 0), (255, 255, 30)], 'greyscale': 1},
-    'rangeland': {'range': [(225, 0, 225), (255, 30, 255)], 'greyscale': 2},
-    'forest_land': {'range': [(0, 225, 0), (30, 255, 30)], 'greyscale': 3},
-    'water': {'range': [(0, 0, 225), (30, 30, 255)], 'greyscale': 4},
-    'barren_land': {'range': [(225, 225, 225), (255, 255, 255)], 'greyscale': 5},
-    'unknown': {'range': [(0, 0, 0), (30, 30, 30)], 'greyscale': 6}
+    'unknown': {'color': [0, 0, 0], 'greyscale': 0},
+    'urban_land': {'color': [0, 255, 255], 'greyscale': 1},
+    'agriculture_land': {'color': [255, 255, 0], 'greyscale': 2},
+    'rangeland': {'color': [255, 0, 255], 'greyscale': 3},
+    'forest_land': {'color': [0, 255, 0], 'greyscale': 4},
+    'water': {'color': [0, 0, 255], 'greyscale': 5},
+    'barren_land': {'color': [255, 255, 255], 'greyscale': 6}
 }
 
 # Function to map colors to greyscale
@@ -20,17 +20,17 @@ def map_color_to_greyscale(image, color_classes):
     greyscale_image = np.zeros((height, width), dtype=np.uint8)
 
     for color_class in color_classes.values():
-        lower_bound = np.array(color_class['range'][0], dtype=np.uint8)
-        upper_bound = np.array(color_class['range'][1], dtype=np.uint8)
+        color = np.array(color_class['color'], dtype=np.uint8)
         grey_value = color_class['greyscale']
 
-        mask = cv2.inRange(image, lower_bound, upper_bound)
-        greyscale_image[mask > 0] = grey_value
+        # Create a mask where the pixel matches the class color
+        mask = np.all(image == color, axis=-1)
+        greyscale_image[mask] = grey_value
 
     return greyscale_image
 
 # Path to the folder containing the masks
-input_folder = '../data/land_cover/ann_dir/grayt'
+input_folder = '../data/land_cover/ann_dir/greytrain'
 output_folder = '../data/land_cover/ann_dir/train'
 Path(output_folder).mkdir(parents=True, exist_ok=True)
 

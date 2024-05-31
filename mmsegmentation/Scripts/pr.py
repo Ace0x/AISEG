@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Path to the image file
-image_path = "../data/land_cover/ann_dir/val/119_mask.png"
+image_path = "../data/land_cover/ann_dir/train/470446_mask.png"
 output_file = "output_matrix.txt"
 
 # Read the image
