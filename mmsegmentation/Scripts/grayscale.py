@@ -29,29 +29,55 @@ def map_color_to_greyscale(image, color_classes):
 
     return greyscale_image
 
-# Path to the folder containing the masks
-input_folder = '../data/land_cover/ann_dir/greytrain'
-output_folder = '../data/land_cover/ann_dir/train'
-Path(output_folder).mkdir(parents=True, exist_ok=True)
+# Paths to the folders
+mask_input_folder = '../data/land_cover/ann_dir/greytrain'
+sat_input_folder = '../data/land_cover/img_dir/train'
+mask_output_folder = '../data/land_cover/ann_dir/train'
+sat_output_folder = '../data/land_cover/img_dir/train'
+Path(mask_output_folder).mkdir(parents=True, exist_ok=True)
+Path(sat_output_folder).mkdir(parents=True, exist_ok=True)
 
 # Process each image in the input folder
-for filename in os.listdir(input_folder):
-    if filename.endswith('.png') or filename.endswith('.jpg'):
-        # Read the image
-        image_path = os.path.join(input_folder, filename)
-        image = cv2.imread(image_path)
+for filename in os.listdir(mask_input_folder):
+    if filename.endswith('_mask.png'):
+        # Read the mask
+        mask_path = os.path.join(mask_input_folder, filename)
+        mask = cv2.imread(mask_path)
 
         # Convert from BGR to RGB
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
-        # Resize the image to 256x256
-        image = cv2.resize(image, (256, 256))
+        # Resize the mask to 256x256
+        mask = cv2.resize(mask, (256, 256))
 
         # Map colors to greyscale
-        greyscale_image = map_color_to_greyscale(image, color_classes)
+        greyscale_mask = map_color_to_greyscale(mask, color_classes)
 
-        # Save the resulting image
-        output_path = os.path.join(output_folder, filename)
-        cv2.imwrite(output_path, greyscale_image)
+        # Read the corresponding satellite image
+        base_filename = filename.replace('_mask.png', '')
+        sat_filename = f"{base_filename}_sat.jpg"
+        sat_path = os.path.join(sat_input_folder, sat_filename)
+        if not os.path.exists(sat_path):
+            print(f"Satellite image for {filename} not found, skipping.")
+            continue
+        sat_image = cv2.imread(sat_path)
 
-print("Processing complete. Greyscale masks saved to", output_folder)
+        # Resize the satellite image to 256x256
+        sat_image = cv2.resize(sat_image, (256, 256))
+
+        # Save the resulting mask and satellite image
+        mask_output_path = os.path.join(mask_output_folder, filename)
+        sat_output_path = os.path.join(sat_output_folder, sat_filename)
+        cv2.imwrite(mask_output_path, greyscale_mask)
+        cv2.imwrite(sat_output_path, sat_image)
+
+        # Check if the mask contains the 'unknown' class
+        if 6 in greyscale_mask:
+            # Save additional copies for oversampling
+            for i in range(3):  # Adjust the number of copies as needed
+                mask_oversample_output_path = os.path.join(mask_output_folder, f"{base_filename}_mask_copy{i}.png")
+                sat_oversample_output_path = os.path.join(sat_output_folder, f"{base_filename}_sat_copy{i}.jpg")
+                cv2.imwrite(mask_oversample_output_path, greyscale_mask)
+                cv2.imwrite(sat_oversample_output_path, sat_image)
+
+print("Processing complete. Greyscale masks and satellite images saved to their respective folders.")
