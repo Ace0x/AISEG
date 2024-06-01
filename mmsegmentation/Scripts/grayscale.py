@@ -5,13 +5,13 @@ from pathlib import Path
 
 # Define the color classes with their exact values
 color_classes = {
-    'unknown': {'color': [0, 0, 0], 'greyscale': 0},
-    'urban_land': {'color': [0, 255, 255], 'greyscale': 1},
-    'agriculture_land': {'color': [255, 255, 0], 'greyscale': 2},
-    'rangeland': {'color': [255, 0, 255], 'greyscale': 3},
-    'forest_land': {'color': [0, 255, 0], 'greyscale': 4},
-    'water': {'color': [0, 0, 255], 'greyscale': 5},
-    'barren_land': {'color': [255, 255, 255], 'greyscale': 6}
+    'urban_land': {'color': [0, 255, 255], 'greyscale': 0},
+    'agriculture_land': {'color': [255, 255, 0], 'greyscale': 1},
+    'rangeland': {'color': [255, 0, 255], 'greyscale': 2},
+    'forest_land': {'color': [0, 255, 0], 'greyscale': 3},
+    'water': {'color': [0, 0, 255], 'greyscale': 4},
+    'barren_land': {'color': [255, 255, 255], 'greyscale': 5},
+    'unknown': {'color': [0, 0, 0], 'greyscale': 6}
 }
 
 # Function to map colors to greyscale
@@ -43,6 +43,9 @@ for filename in os.listdir(input_folder):
 
         # Convert from BGR to RGB
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        # Resize the image to 256x256
+        image = cv2.resize(image, (256, 256))
 
         # Map colors to greyscale
         greyscale_image = map_color_to_greyscale(image, color_classes)

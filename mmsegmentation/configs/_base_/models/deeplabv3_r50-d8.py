@@ -2,8 +2,8 @@
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 data_preprocessor = dict(
     type='SegDataPreProcessor',
-    mean=[123.675, 116.28, 103.53],
-    std=[58.395, 57.12, 57.375],
+    mean=[104.20938983863958, 96.51949998162327, 71.48244633784903],
+    std=[37.50431906433212, 29.372695663205022, 26.88977626469204],
     bgr_to_rgb=True,
     pad_val=0,
     seg_pad_val=255)
@@ -33,7 +33,7 @@ model = dict(
         norm_cfg=norm_cfg,
         align_corners=False,
         loss_decode=dict(
-            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0)),
+            type='DiceLoss', use_sigmoid=False, loss_weight=1.0)),
     auxiliary_head=dict(
         type='FCNHead',
         in_channels=1024,
@@ -46,7 +46,7 @@ model = dict(
         norm_cfg=norm_cfg,
         align_corners=False,
         loss_decode=dict(
-            type='CrossEntropyLoss', use_sigmoid=False, loss_weight=0.4)),
+            type='DiceLoss', use_sigmoid=False, loss_weight=0.4)),
     # model training and testing settings
     train_cfg=dict(),
     test_cfg=dict(mode='whole'))
