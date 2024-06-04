@@ -20,6 +20,12 @@ def land_cover():
         'bicycle'
     ]
 
+def land_class_classes():
+    ""
+    return [
+        'urban_land','agriculture_land','rangeland','forest_land','water','barren_land','unknown'
+    ]
+
 def ade_classes():
     """ADE20K class names for external use."""
     return [
@@ -186,6 +192,9 @@ def mapillary_v1_palette():
             [119, 11, 32], [150, 0, 255], [0, 60, 100], [0, 0, 142],
             [0, 0, 90], [0, 0, 230], [0, 80, 100], [128, 64, 64], [0, 0, 110],
             [0, 0, 70], [0, 0, 192], [32, 32, 32], [120, 10, 10], [0, 0, 0]]
+
+def land_class_palette():
+    return [[0,255,255],[255,255,0],[255,0,255],[0,255,0],[0,0,255],[255,255,255],[0,0,0]]
 
 
 def mapillary_v2_classes():

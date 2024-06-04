@@ -1,7 +1,7 @@
 # dataset settings
 dataset_type = 'LandClassDataset'
 data_root = 'data/land_cover/'
-crop_size = (128, 128)
+crop_size = (256, 256)
 
 # Define the training pipeline with the necessary augmentations
 train_pipeline = [
@@ -40,8 +40,8 @@ tta_pipeline = [
 
 # Data loader for training
 train_dataloader = dict(
-    batch_size=32,
-    num_workers=8,  # Adjusted number of workers
+    batch_size=4,
+    num_workers=2,  # Adjusted number of workers
     persistent_workers=True,
     sampler=dict(type='InfiniteSampler', shuffle=True),
     dataset=dict(
@@ -54,8 +54,8 @@ train_dataloader = dict(
 
 # Data loader for validation
 val_dataloader = dict(
-    batch_size=16,
-    num_workers=4,  # Adjusted number of workers
+    batch_size=1,
+    num_workers=2,  # Adjusted number of workers
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
@@ -72,5 +72,3 @@ test_dataloader = val_dataloader
 # Evaluators for validation and testing
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
 test_evaluator = val_evaluator
-
-resume_from = '../../../work_dirs/deeplabv3_r50-d8_4xb2-40k_LandClass-512x1024/iter_18000.pth'

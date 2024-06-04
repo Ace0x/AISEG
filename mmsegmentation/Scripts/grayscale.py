@@ -3,15 +3,15 @@ import cv2
 import numpy as np
 from pathlib import Path
 
-# Define the color classes with their exact values
+# Define the color classes with their lower and upper boundaries
 color_classes = {
-    'urban_land': {'color': [0, 255, 255], 'greyscale': 0},
-    'agriculture_land': {'color': [255, 255, 0], 'greyscale': 1},
-    'rangeland': {'color': [255, 0, 255], 'greyscale': 2},
-    'forest_land': {'color': [0, 255, 0], 'greyscale': 3},
-    'water': {'color': [0, 0, 255], 'greyscale': 4},
-    'barren_land': {'color': [255, 255, 255], 'greyscale': 5},
-    'unknown': {'color': [0, 0, 0], 'greyscale': 6}
+    'urban_land': {'lower': [0, 245, 245], 'upper': [10, 255, 255], 'greyscale': 0},
+    'agriculture_land': {'lower': [245, 245, 0], 'upper': [255, 255, 10], 'greyscale': 1},
+    'rangeland': {'lower': [245, 0, 245], 'upper': [255, 10, 255], 'greyscale': 2},
+    'forest_land': {'lower': [0, 245, 0], 'upper': [10, 255, 10], 'greyscale': 3},
+    'water': {'lower': [0, 0, 245], 'upper': [10, 10, 255], 'greyscale': 4},
+    'barren_land': {'lower': [245, 245, 245], 'upper': [255, 255, 255], 'greyscale': 5},
+    'unknown': {'lower': [0, 0, 0], 'upper': [10, 10, 10], 'greyscale': 6}
 }
 
 # Function to map colors to greyscale
@@ -20,20 +20,21 @@ def map_color_to_greyscale(image, color_classes):
     greyscale_image = np.zeros((height, width), dtype=np.uint8)
 
     for color_class in color_classes.values():
-        color = np.array(color_class['color'], dtype=np.uint8)
+        lower = np.array(color_class['lower'], dtype=np.uint8)
+        upper = np.array(color_class['upper'], dtype=np.uint8)
         grey_value = color_class['greyscale']
 
-        # Create a mask where the pixel matches the class color
-        mask = np.all(image == color, axis=-1)
-        greyscale_image[mask] = grey_value
+        # Create a mask where the pixel falls within the color boundaries
+        mask = cv2.inRange(image, lower, upper)
+        greyscale_image[mask > 0] = grey_value
 
     return greyscale_image
 
 # Paths to the folders
-mask_input_folder = '../data/land_cover/ann_dir/greytrain'
-sat_input_folder = '../data/land_cover/img_dir/train'
-mask_output_folder = '../data/land_cover/ann_dir/train'
-sat_output_folder = '../data/land_cover/img_dir/train'
+mask_input_folder = '../data/land_cover/train/original'
+sat_input_folder = '../data/land_cover/train/original'
+mask_output_folder = '../data/land_cover/train/mask'
+sat_output_folder = '../data/land_cover/train/sat'
 Path(mask_output_folder).mkdir(parents=True, exist_ok=True)
 Path(sat_output_folder).mkdir(parents=True, exist_ok=True)
 
@@ -48,7 +49,7 @@ for filename in os.listdir(mask_input_folder):
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
         # Resize the mask to 256x256
-        mask = cv2.resize(mask, (256, 256))
+        mask = cv2.resize(mask, (256, 256), interpolation=cv2.INTER_NEAREST)
 
         # Map colors to greyscale
         greyscale_mask = map_color_to_greyscale(mask, color_classes)
