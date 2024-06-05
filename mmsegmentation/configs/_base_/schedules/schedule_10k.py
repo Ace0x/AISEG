@@ -1,3 +1,5 @@
+#HERE
+
 # optimizer
 optimizer = dict(type='SGD', lr=0.01, momentum=0.9, weight_decay=0.0005)
 optim_wrapper = dict(type='OptimWrapper', optimizer=optimizer) 
@@ -10,7 +12,7 @@ param_scheduler = [
         power=0.9,
         begin=0,
         end=40000,
-        by_epoch=False)
+        by_epoch=True)
 ]
 
 # training schedule for 20k iterations
