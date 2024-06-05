@@ -92,6 +92,8 @@ env.bak/
 venv.bak/
 .DS_Store
 
+results
+
 # Spyder project settings
 .spyderproject
 .spyproject

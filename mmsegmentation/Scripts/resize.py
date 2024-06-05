@@ -3,8 +3,8 @@ import cv2
 from pathlib import Path
 
 # Path to the folder containing the images
-input_folder = '../data/land_cover/img_dir/train'
-output_folder = '../data/land_cover/img_dir/retrain'
+input_folder = '../data/land_cover/train/test'
+output_folder = '../data/land_cover/train/testv2'
 Path(output_folder).mkdir(parents=True, exist_ok=True)
 
 # Process each image in the input folder

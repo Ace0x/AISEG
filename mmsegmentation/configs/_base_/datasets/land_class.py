@@ -1,7 +1,7 @@
 # dataset settings
 dataset_type = 'LandClassDataset'
 data_root = 'data/land_cover/'
-crop_size = (256, 256)
+crop_size = (128, 128)
 
 # Define the training pipeline with the necessary augmentations
 train_pipeline = [
@@ -40,7 +40,7 @@ tta_pipeline = [
 
 # Data loader for training
 train_dataloader = dict(
-    batch_size=4,
+    batch_size=32,
     num_workers=2,  # Adjusted number of workers
     persistent_workers=True,
     sampler=dict(type='InfiniteSampler', shuffle=True),
@@ -54,7 +54,7 @@ train_dataloader = dict(
 
 # Data loader for validation
 val_dataloader = dict(
-    batch_size=1,
+    batch_size=4,
     num_workers=2,  # Adjusted number of workers
     persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=False),
@@ -68,6 +68,7 @@ val_dataloader = dict(
 
 # Reuse validation dataloader settings for testing
 test_dataloader = val_dataloader
+
 
 # Evaluators for validation and testing
 val_evaluator = dict(type='IoUMetric', iou_metrics=['mIoU'])
