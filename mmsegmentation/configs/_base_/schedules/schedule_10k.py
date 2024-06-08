@@ -12,7 +12,7 @@ param_scheduler = [
         power=0.9,
         begin=0,
         end=40000,
-        by_epoch=True)
+        by_epoch=False)
 ]
 
 # training schedule for 20k iterations

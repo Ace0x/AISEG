@@ -40,7 +40,7 @@ tta_pipeline = [
         ])
 ]
 
-# Data loader for training
+# Data loader for  training
 train_dataloader = dict(
     batch_size=32,
     num_workers=2,  # Adjusted number of workers
